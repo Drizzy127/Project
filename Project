@@ -1,0 +1,166 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
+ */
+package project;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+abstract class Product {
+    private String name;
+    private double price;
+
+    public Product(String name, double price) {
+        this.name = name;
+        this.price = price;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s - $%.2f", name, price);
+    }
+}
+
+class Electronics extends Product {
+    public Electronics(String name, double price) {
+        super(name, price);
+    }
+}
+
+class Clothing extends Product {
+    public Clothing(String name, double price) {
+        super(name, price);
+    }
+}
+
+class Grocery extends Product {
+    public Grocery(String name, double price) {
+        super(name, price);
+    }
+}
+
+
+abstract class User {
+    private String name;
+
+    public User(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+}
+
+
+class Customer extends User {
+    private List<Product> cart = new ArrayList<>();
+
+    public Customer(String name) {
+        super(name);
+    }
+
+    public List<Product> getCart() {
+        return cart;
+    }
+
+    public void addToCart(Product product) {
+        cart.add(product);
+    }
+
+    public void clearCart() {
+        cart.clear();
+    }
+}
+
+class Admin extends User {
+    public Admin(String name) {
+        super(name);
+    }
+}
+
+
+class Order {
+    private static int orderCounter = 0;
+    private int orderId;
+    private List<Product> products;
+
+    public Order(List<Product> products) {
+        this.orderId = ++orderCounter;
+        this.products = new ArrayList<>(products);
+    }
+
+    public int getOrderId() {
+        return orderId;
+    }
+
+    public double calculateTotal() {
+        return products.stream().mapToDouble(Product::getPrice).sum();
+    }
+
+    public double applyTax(double taxRate) {
+        return calculateTotal() * taxRate;
+    }
+
+    public double calculateShipping(double shippingFee) {
+        return shippingFee;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Order ID: %d, Total: $%.2f", orderId, calculateTotal());
+    }
+}
+
+
+public class Project {
+    public static void main(String[] args) {
+        List<Product> products = Arrays.asList(
+                new Electronics("Smartphone", 699.99),
+                new Electronics("Laptop", 1299.99),
+                new Clothing("T-shirt", 19.99),
+                new Grocery("Milk", 3.49),
+                new Grocery("Bread", 2.99)
+        );
+
+  
+        System.out.println("Available Products:");
+        products.forEach(System.out::println);
+
+       
+        System.out.println("\nElectronics:");
+        products.stream()
+                .filter(product -> product instanceof Electronics)
+                .forEach(System.out::println);
+
+        
+        Customer customer = new Customer("John Doe");
+        customer.addToCart(products.get(0)); 
+        customer.addToCart(products.get(2));
+
+        
+        System.out.println("\nCart:");
+        customer.getCart().forEach(System.out::println);
+
+        Order order = new Order(customer.getCart());
+        double taxRate = 0.08; 
+        double shippingFee = 5.99;
+
+        double total = order.calculateTotal();
+        double tax = order.applyTax(taxRate);
+        double shipping = order.calculateShipping(shippingFee);
+        double finalTotal = total + tax + shipping;
+
+        System.out.printf("\nOrder Summary:\nTotal: $%.2f\nTax: $%.2f\nShipping: $%.2f\nFinal Total: $%.2f\n", total, tax, shipping, finalTotal);
+
+    }
+}
